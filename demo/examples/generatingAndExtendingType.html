@@ -1,0 +1,150 @@
+<h3 class="attireTitleType3">Generating type</h3>
+
+<p class="attireTextType2">
+    Without typeFactory you could define a type with code similar to one bellow.
+</p>
+
+<script>
+
+    // first we define a constructor function
+    var Person = function(name) {
+        this.name = name;
+    };
+
+    // then we add methods to function prototype (instance methods)
+    Person.prototype.sayHi = function() {
+        console.log('Hello, my name is ' + this.name);
+    };
+
+    // now lets make a new person...
+    var john = new Person('John');
+
+    // ...and make them do something
+    john.sayHi(); // outputs 'Hello, my name is John'
+
+</script>
+
+<pre class="attireCodeHighlight"><code class="language-javascript">
+    // first we define a constructor function
+    var Person = function(name) {
+        this.name = name;
+    };
+
+    // then we add methods to function prototype (instance methods)
+    Person.prototype.sayHi = function() {
+        console.log('Hello, my name is ' + this.name);
+    };
+
+    // now lets make a new person...
+    var john = new Person('John');
+
+    // ...and make them do something
+    john.sayHi(); // outputs 'Hello, my name is John'
+</code></pre>
+
+<p class="attireTextType2">
+    Same functionality with typeFactory would be achieved like so:
+</p>
+
+<script>
+
+    var Person = typeFactory({
+        initialize: function(name) {
+            this.name = name;
+        },
+        sayHi: function() {
+            console.log('Hello, my name is ' + this.name);
+        }
+    });
+
+    var george = new Person('George');
+    george.sayHi();
+
+</script>
+
+<pre class="attireCodeHighlight"><code class="language-javascript">
+    var Person = typeFactory({
+        initialize: function(name) {
+            this.name = name;
+        },
+        sayHi: function() {
+            console.log('Hello, my name is ' + this.name);
+        }
+    });
+
+    var george = new Person('George');
+    george.sayHi(); // outputs 'Hello, my name is George'
+</code></pre>
+
+<hr class="attireSeparator mod1">
+
+<h3 class="attireTitleType3">Extending type</h3>
+
+<p class="attireTextType2">
+    Every type produced with typeFactory receives convenient extend method for all your extending needs. Consider next example:
+</p>
+
+<script>
+    var Musician = Person.extend({
+        play: function() {
+            console.log(this.name + ' is playing!');
+        }
+    });
+
+    var peter = new Musician('Peter');
+
+    peter.sayHi();
+    peter.play();
+</script>
+
+<pre class="attireCodeHighlight"><code class="language-javascript">
+    var Musician = Person.extend({
+        play: function() {
+            console.log(this.name + ' is playing!');
+        }
+    });
+
+    var peter = new Musician('Peter');
+
+    peter.sayHi(); // outputs 'Hello, my name is Peter'
+    peter.play(); // outputs 'Peter is playing'
+</code></pre>
+
+<p class="attireTextType2">
+    Every type can be extended further:
+</p>
+
+<script>
+    var Guitarist = Musician.extend({
+        play: function() {
+            console.log(this.name + ' is playing guitar!');
+        }
+    });
+
+    var jimmi = new Guitarist('Jimmi');
+
+    jimmi.sayHi(); // outputs 'Hello, my name is Jimmy'
+    jimmi.play(); // outputs 'Jimmy is playing guitar'
+
+    console.log(jimmi instanceof Guitarist); // true
+    console.log(jimmi instanceof Musician); // true
+    console.log(jimmi instanceof Person); // true
+</script>
+
+<pre class="attireCodeHighlight"><code class="language-javascript">
+    var Guitarist = Musician.extend({
+        play: function() {
+            console.log(this.name + ' is playing guitar!');
+        }
+    });
+
+    var jimmi = new Guitarist('Jimmi');
+
+    jimmi.sayHi(); // outputs 'Hello, my name is Jimmy'
+    jimmi.play(); // outputs 'Jimmy is playing guitar'
+
+    console.log(jimmi instanceof Guitarist); // true
+    console.log(jimmi instanceof Musician); // true
+    console.log(jimmi instanceof Person); // true
+</code></pre>
+

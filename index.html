@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<title>Mitty</title>
+<meta name="description" content="Simple event emmiter for javascript. Enables objects to publish and subscribe to events.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href='https://fonts.googleapis.com/css?family=Lato:400,300,700,900&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://rawgit.com/dbrekalo/attire/master/dist/css/build.min.css">
+<script src="https://rawgit.com/dbrekalo/attire/master/dist/js/build.min.js"></script>
+
+        <script src="dist/mitty.js"></script>
+
+    </head>
+<body>
+
+    <section id="section-about" class="attireBlock">
+    <div class="inner">
+
+        <h1 data-nav-title="About" class="attireTitleType1">Mitty</h1>
+
+        <p class="attireTextType1">
+            Simple event emmiter for javascript. Enables objects to publish and subscribe to events with api similar to Backbone events.
+            Weighs less than 1KB.
+        </p>
+
+        <nav class="attireAuthor">
+    <a class="imageElement" href="https://github.com/dbrekalo">
+        <img src="https://s.gravatar.com/avatar/32754a476fb3db1c5a1f9ad80c65d89d?s=80" alt="Damir Brekalo">
+    </a>
+    <a class="name" href="https://github.com/dbrekalo">Damir Brekalo</a>
+    <p class="socialBox">
+        <a href="mailto:dbrekalo@gmail.com" class="iconMail" title="Contact me by email">Contact me by email</a>
+        <a href="https://github.com/dbrekalo" class="iconGithub" title="Find me on Github">Find me on Github</a>
+        <a href="https://twitter.com/damirbr" class="iconTwitter" title="Reach me on Twitter">Reach me on Twitter</a>
+    </p>
+</nav>
+
+        <p class="attireTextType2">
+            With mitty every extended object can publish and listen to events of any kind.
+            Objects can be publishers and subscribers simultaneously.
+            Mitty provides a simple api for one object to listen to it's own events or subscribe to some other object events.
+        </p>
+
+    </div>
+</section>
+
+    <section id="section-examples" class="attireBlock mod1">
+    <div class="inner">
+
+        <h2 class="attireTitleType2">Examples</h2>
+
+        <p class="attireTextType2">
+           Subscribe object to events with on(), publish events with trigger(), remove them with off()
+        </p>
+
+        <script>
+            // start with simple object
+            var musician = {name: 'George'};
+
+            // use "mitty" function to augment object with event api
+            mitty(musician);
+
+            // subscribe to play event
+            musician.on('play', function(message) {
+                console.log(this.name + ' is currently playing. ' + message);
+            });
+
+            // trigger / publish "play" event with custom message as data
+            // outputs 'George is currently playing. With style!'
+            musician.trigger('play', 'With style!');
+
+            // Remove subscription
+            musician.off('play');
+
+            // Trigger does nothing since we removed  subscription
+            musician.trigger('play', 'With style again!');
+        </script>
+
+        <pre class="attireCodeHighlight"><code class="language-javascript">
+            // start with simple object
+            var musician = {name: 'George'};
+
+            // use "mitty" function to augment object with event api
+            mitty(musician);
+
+            // subscribe to play event
+            musician.on('play', function(message) {
+                console.log(this.name + ' is currently playing. ' + message);
+            });
+
+            // trigger / publish "play" event with custom message as data
+            // outputs 'George is currently playing. With style!'
+            musician.trigger('play', 'With style!');
+
+            // Remove subscription
+            musician.off('play');
+
+            // Trigger does nothing since we removed  subscription
+            musician.trigger('play', 'With style again!');
+        </code></pre>
+
+        <p class="attireTextType2">
+            Use listenTo() when you want to subscribe to some other object events.
+            Invoke stopListening() when you want to remove those subscriptions.
+        </p>
+
+        <script>
+            var instrument = mitty({type: 'Guitar'});
+
+            instrument.listenTo(musician, 'play', function() {
+                console.log(musician.name + ' is playing ' + this.type + ' with grace!');
+            });
+
+            musician.trigger('play');
+
+            // Remove subscription
+            instrument.stopListening(musician);
+
+            // Will not output
+            musician.trigger('play');
+        </script>
+
+        <pre class="attireCodeHighlight"><code class="language-javascript">
+            var instrument = mitty({type: 'Guitar'});
+
+            instrument.listenTo(musician, 'play', function() {
+                console.log(musician.name + ' is playing ' + this.type + ' with grace!');
+            });
+
+            musician.trigger('play');
+
+            // Remove subscription
+            instrument.stopListening(musician);
+
+            // Will not output
+            musician.trigger('play');
+        </code></pre>
+
+        <p class="attireTextType2">
+            Types / prototype based constructor functions can also be augmented with events like so:
+        </p>
+
+        <script>
+            function Person(name) {
+                this.name = name;
+            }
+
+            mitty(Person.prototype);
+
+            var john = new Person('John');
+
+            john.on('sayHello', function() {
+                console.log(this.name + ' says hello');
+            });
+
+            john.trigger('sayHello'); // outputs 'John says hello'
+        </script>
+
+        <pre class="attireCodeHighlight"><code class="language-javascript">
+            function Person(name) {
+                this.name = name;
+            }
+
+            mitty(Person.prototype);
+
+            var john = new Person('John');
+
+            john.on('sayHello', function() {
+                console.log(this.name + ' says hello');
+            });
+
+            john.trigger('sayHello'); // outputs 'John says hello'
+        </code></pre>
+
+    </div>
+</section>
+
+    <section id="section-installation" class="attireBlock">
+    <div class="inner">
+
+        <h2 class="attireTitleType2">Installation</h2>
+
+        <p class="attireTextType2">
+            For browser usage browse dist folder - if working with build tools go with src folder.
+            Get library files from <a href="https://github.com/dbrekalo/mitty">github repo</a> or via bower (bower install mitty)
+            or npm (npm install mitty).
+        </p>
+
+    </div>
+</section>
+
+
+    <a class="githubRibbon" href="https://github.com/dbrekalo/mitty">
+    <img src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+</a>
+    <footer class="attireFooter">
+    <p>This page is built with <a href="http://dbrekalo.github.io/attire/">Attire</a>.</p>
+</footer>
+
+</body>
+
+</html>

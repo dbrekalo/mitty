@@ -1,0 +1,31 @@
+{
+  "name": "mitty",
+  "version": "1.0.0",
+  "description": "Simple event emmiter for javascript. Enables objects to publish and subscribe to events",
+  "author": {
+    "email": "dbrekalo@gmail.com",
+    "name": "Damir Brekalo"
+  },
+  "keywords": [
+    "event",
+    "emitter",
+    "publish",
+    "subscibe",
+    "pubsub"
+  ],
+  "main": "src/mitty.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dbrekalo/mitty"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-copy": "^0.6.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-jscs": "^1.5.0",
+    "grunt-include-replace": "^3.2.0",
+    "load-grunt-tasks": "^0.6.0"
+  }
+}
