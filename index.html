@@ -23,7 +23,7 @@
         <h1 data-nav-title="About" class="attireTitleType1">Mitty</h1>
 
         <p class="attireTextType1">
-            Simple event emmiter for javascript. Enables objects to publish and subscribe to events with api similar to Backbone events.
+            Simple event emitter for javascript. Enables objects to publish and subscribe to events with api similar to Backbone events.
             Weighs less than 1KB.
         </p>
 
@@ -40,8 +40,8 @@
 </nav>
 
         <p class="attireTextType2">
-            With mitty every extended object can publish and listen to events of any kind.
-            Objects can be publishers and subscribers simultaneously.
+            With mitty every extended object can publish and listen to custom events.
+            Objects can be both publishers and subscribers simultaneously.
             Mitty provides a simple api for one object to listen to it's own events or subscribe to some other object events.
         </p>
 
@@ -54,7 +54,7 @@
         <h2 class="attireTitleType2">Examples</h2>
 
         <p class="attireTextType2">
-           Subscribe object to events with on(), publish events with trigger(), remove them with off()
+           Subscribe object to events with on(), publish events with trigger()
         </p>
 
         <script>
@@ -72,12 +72,6 @@
             // trigger / publish "play" event with custom message as data
             // outputs 'George is currently playing. With style!'
             musician.trigger('play', 'With style!');
-
-            // Remove subscription
-            musician.off('play');
-
-            // Trigger does nothing since we removed  subscription
-            musician.trigger('play', 'With style again!');
         </script>
 
         <pre class="attireCodeHighlight"><code class="language-javascript">
@@ -95,13 +89,31 @@
             // trigger / publish "play" event with custom message as data
             // outputs 'George is currently playing. With style!'
             musician.trigger('play', 'With style!');
+        </code></pre>
 
+        <hr class="attireSeparator mod1">
+
+        <p class="attireTextType2">
+           Remove events with off()
+        </p>
+
+        <script>
+            // Remove subscription
+            musician.off('play');
+
+            // Trigger does nothing since we removed  subscription
+            musician.trigger('play', 'With style again!');
+        </script>
+
+        <pre class="attireCodeHighlight"><code class="language-javascript">
             // Remove subscription
             musician.off('play');
 
             // Trigger does nothing since we removed  subscription
             musician.trigger('play', 'With style again!');
         </code></pre>
+
+        <hr class="attireSeparator mod1">
 
         <p class="attireTextType2">
             Use listenTo() when you want to subscribe to some other object events.
@@ -115,6 +127,7 @@
                 console.log(musician.name + ' is playing ' + this.type + ' with grace!');
             });
 
+            // Outputs 'George is playing Guitar with grace!'
             musician.trigger('play');
 
             // Remove subscription
@@ -131,6 +144,7 @@
                 console.log(musician.name + ' is playing ' + this.type + ' with grace!');
             });
 
+            // Outputs 'George is playing Guitar with grace!'
             musician.trigger('play');
 
             // Remove subscription
@@ -139,6 +153,8 @@
             // Will not output
             musician.trigger('play');
         </code></pre>
+
+        <hr class="attireSeparator mod1">
 
         <p class="attireTextType2">
             Types / prototype based constructor functions can also be augmented with events like so:

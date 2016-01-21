@@ -4,7 +4,7 @@
         <h2 class="attireTitleType2">Examples</h2>
 
         <p class="attireTextType2">
-           Subscribe object to events with on(), publish events with trigger(), remove them with off()
+           Subscribe object to events with on(), publish events with trigger()
         </p>
 
         <script>
@@ -22,12 +22,6 @@
             // trigger / publish "play" event with custom message as data
             // outputs 'George is currently playing. With style!'
             musician.trigger('play', 'With style!');
-
-            // Remove subscription
-            musician.off('play');
-
-            // Trigger does nothing since we removed  subscription
-            musician.trigger('play', 'With style again!');
         </script>
 
         <pre class="attireCodeHighlight"><code class="language-javascript">
@@ -45,13 +39,31 @@
             // trigger / publish "play" event with custom message as data
             // outputs 'George is currently playing. With style!'
             musician.trigger('play', 'With style!');
+        </code></pre>
 
+        <hr class="attireSeparator mod1">
+
+        <p class="attireTextType2">
+           Remove events with off()
+        </p>
+
+        <script>
+            // Remove subscription
+            musician.off('play');
+
+            // Trigger does nothing since we removed  subscription
+            musician.trigger('play', 'With style again!');
+        </script>
+
+        <pre class="attireCodeHighlight"><code class="language-javascript">
             // Remove subscription
             musician.off('play');
 
             // Trigger does nothing since we removed  subscription
             musician.trigger('play', 'With style again!');
         </code></pre>
+
+        <hr class="attireSeparator mod1">
 
         <p class="attireTextType2">
             Use listenTo() when you want to subscribe to some other object events.
@@ -65,6 +77,7 @@
                 console.log(musician.name + ' is playing ' + this.type + ' with grace!');
             });
 
+            // Outputs 'George is playing Guitar with grace!'
             musician.trigger('play');
 
             // Remove subscription
@@ -81,6 +94,7 @@
                 console.log(musician.name + ' is playing ' + this.type + ' with grace!');
             });
 
+            // Outputs 'George is playing Guitar with grace!'
             musician.trigger('play');
 
             // Remove subscription
@@ -89,6 +103,8 @@
             // Will not output
             musician.trigger('play');
         </code></pre>
+
+        <hr class="attireSeparator mod1">
 
         <p class="attireTextType2">
             Types / prototype based constructor functions can also be augmented with events like so:
