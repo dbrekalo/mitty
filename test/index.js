@@ -83,6 +83,70 @@ describe("mitty", function() {
 
     });
 
+    it('stopListening will remove listener speficied with object, event and callback', function() {
+
+        var musician = mitty({name: 'George'});
+        var instrument = mitty({type: 'Guitar'});
+        var listener = function() { instrument.isProducingSound = true; };
+
+        instrument.listenTo(musician, 'play', listener);
+        instrument.listenTo(musician, 'walkAway', function() { instrument.isSilent = true; });
+
+        instrument.stopListening(musician, 'play', listener);
+
+        musician.trigger('play').trigger('walkAway');
+
+        assert.isTrue(instrument.isSilent);
+        assert.isUndefined(instrument.isProducingSound);
+
+    });
+
+    it('stopListening will remove listener speficied with object and event', function() {
+
+        var musician = mitty({name: 'George'});
+        var instrument = mitty({type: 'Guitar'});
+
+        instrument.listenTo(musician, 'play', function() { instrument.isProducingSound = true; });
+        instrument.listenTo(musician, 'walkAway', function() { instrument.isSilent = true; });
+        instrument.stopListening(musician, 'play');
+
+        musician.trigger('play').trigger('walkAway');
+
+        assert.isTrue(instrument.isSilent);
+        assert.isUndefined(instrument.isProducingSound);
+
+    });
+
+    it('stopListening will remove listener speficied with object', function() {
+
+        var musician = mitty({name: 'George'});
+        var instrument = mitty({type: 'Guitar'});
+
+        instrument.listenTo(musician, 'play', function() { instrument.isProducingSound = true; });
+        instrument.stopListening(musician);
+
+        musician.trigger('play');
+
+        assert.isUndefined(instrument.isProducingSound);
+
+    });
+
+    it('stopListening will remove all listeners', function() {
+
+        var musician = mitty({name: 'George'});
+        var instrument = mitty({type: 'Guitar'});
+
+        instrument.listenTo(musician, 'play', function() { instrument.isProducingSound = true; });
+        instrument.listenTo(musician, 'walkAway', function() { instrument.isSilent = true; });
+        instrument.stopListening();
+
+        musician.trigger('play').trigger('walkAway');
+
+        assert.isUndefined(instrument.isSilent);
+        assert.isUndefined(instrument.isProducingSound);
+
+    });
+
     it('off removes only specified callback', function() {
 
         var musician = mitty({name: 'George'});
