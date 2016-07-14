@@ -83,6 +83,25 @@ describe("mitty", function() {
 
     });
 
+    it('functions correctly when Array.prototype.indexOf is not implemented', function() {
+
+        var oldIndexOf = Array.prototype.indexOf;
+        Array.prototype.indexOf = undefined;
+
+        var musician = mitty({name: 'George'});
+        var instrument = mitty({type: 'Guitar'});
+
+        instrument.listenTo(musician, 'play', function() { instrument.isProducingSound = true; });
+        instrument.listenTo(musician, 'walkAway', function() {});
+
+        musician.trigger('play').off();
+
+        Array.prototype.indexOf = oldIndexOf;
+
+        assert.isTrue(instrument.isProducingSound);
+
+    });
+
     it('stopListening will remove listener speficied with object, event and callback', function() {
 
         var musician = mitty({name: 'George'});
