@@ -1,6 +1,7 @@
 # Mitty
 [![Build Status](https://travis-ci.org/dbrekalo/mitty.svg?branch=master)](https://travis-ci.org/dbrekalo/mitty)
 [![Coverage Status](https://coveralls.io/repos/github/dbrekalo/mitty/badge.svg?branch=master)](https://coveralls.io/github/dbrekalo/mitty?branch=master)
+[![NPM Status](https://img.shields.io/npm/v/mitty.svg)](https://www.npmjs.com/package/mitty)
 
 Simple event emitter for javascript. Enables objects to publish and subscribe to custom events.
 Works client and server side. Weighs less than 1KB.
