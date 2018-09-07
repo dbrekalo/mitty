@@ -15,6 +15,7 @@ Supports all browsers that are ES5-compliant (IE8 and below are not supported).
 
 ## Examples and api
 
+### on and trigger
 Subscribe object to events with on(), publish events with trigger().
 
 ```js
@@ -33,9 +34,7 @@ musician.on('play', function(message) {
 // outputs 'George is currently playing. With style!'
 musician.trigger('play', 'With style!');
 ```
-
-Subscribe object to events with on(), publish events with trigger().
-
+### off
 Remove events with off()
 
 ```js
@@ -46,6 +45,7 @@ musician.off('play');
 musician.trigger('play', 'With style again!');
 ```
 
+### listenTo and stopListening
 Use listenTo() when you want to subscribe to some other object events.
 Invoke stopListening() when you want to remove those subscriptions.
 
@@ -66,6 +66,7 @@ instrument.stopListening(musician);
 musician.trigger('play');
 ```
 
+### once and listenToOnce
 Use once() and listenToOnce() when for executing one time event listeners.
 
 ```js
@@ -93,6 +94,7 @@ musician.trigger('play').trigger('play').trigger('play');
 console.log(instrument.playedTimes) // outputs 1
 ```
 
+### Augmenting objects
 Types / prototype based constructor functions can also be augmented with events like so:
 
 ```js
@@ -120,7 +122,7 @@ Mitty types is packaged as UMD library so you can use it both on client and serv
 npm install mitty --save
 
 // if you use bundler
-var mitty = require('vmitty');
+var mitty = require('mitty');
 
 // or use browser globals
 var mitty = window.mitty;
