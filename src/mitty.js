@@ -11,144 +11,145 @@
 
 }(this, function() {
 
+    var counter = 0;
+
     var api = {
 
         on: function(eventName, callback) {
-            registerEvent(this, this, eventName, callback);
+            addEvent(this, this, eventName, callback);
+            return this;
+        },
+
+        once: function(eventName, callback) {
+            addEvent(this, this, eventName, callback, true);
             return this;
         },
 
         listenTo: function(publisher, eventName, callback) {
-            registerEvent(publisher, this, eventName, callback);
-            this._mittyListenTo = this._mittyListenTo || [];
-            indexOf(this._mittyListenTo, publisher) < 0 && this._mittyListenTo.push(publisher);
+            addEvent(publisher, this, eventName, callback);
+            return this;
+        },
+
+        listenToOnce: function(publisher, eventName, callback) {
+            addEvent(publisher, this, eventName, callback, true);
             return this;
         },
 
         off: function(eventName, callback) {
-            removeFromPublisher(this, null, eventName, callback);
+            removeEvent(this, eventName, callback);
             return this;
         },
 
         stopListening: function(publisher, eventName, callback) {
-            removeFromListener(this, publisher, eventName, callback);
+            removeEventFromListener(this, publisher, eventName, callback);
             return this;
         },
 
         trigger: function(eventName, data) {
-            this._mittyOn && each(this._mittyOn, function(item) {
-                if (item.eventName === eventName) {
-                    item.callback.call(item.listener, data);
-                }
-            });
+            runEvent(this, eventName, data);
             return this;
         }
+
     };
 
-    function each(collection, callback) {
+    function runEvent(publisher, eventName, data) {
 
-        if (collection instanceof Array) {
-            for (var i = 0; i < collection.length; i++) {
-                callback(collection[i], i);
-            }
-        } else {
-            for (var key in collection) {
-                collection.hasOwnProperty(key) && callback(key, collection[key]);
-            }
-        }
+        publisher._mittyOn && publisher._mittyOn.slice().forEach(function(entry) {
 
-    }
+            if (entry.eventName === eventName) {
 
-    function indexOf(collection, objectToSearch) {
+                entry.callback.call(entry.listener, data);
 
-        if (Array.prototype.indexOf) {
-            return collection.indexOf(objectToSearch);
-        } else {
-            for (var i = 0; i < collection.length; i++) {
-                if (collection[i] === objectToSearch) {
-                    return i;
+                if (entry.runOnce) {
+                    entry.listener === entry.publisher
+                        ? removeEvent(entry.publisher, eventName, entry.callback)
+                        : removeEventFromListener(
+                            entry.listener, entry.publisher, eventName, entry.callback
+                        )
+                    ;
                 }
+
             }
-            return -1;
-        }
 
-    }
-
-    function registerEvent(publisher, listener, eventName, callback) {
-
-        publisher._mittyOn = publisher._mittyOn || [];
-
-        publisher._mittyOn.push({
-            listener: listener,
-            eventName: eventName,
-            callback: callback
         });
 
     }
 
-    function removeFromPublisher(publisher, listener, eventName, callback) {
+    function addEvent(publisher, listener, eventName, callback, runOnce) {
 
-        if (publisher._mittyOn && publisher._mittyOn.length) {
+        var key = 'e' + (++counter);
 
-            var criteria = {},
-            temp = [];
+        var entry = {
+            key: key,
+            publisher: publisher,
+            listener: listener,
+            eventName: eventName,
+            callback: callback,
+            runOnce: runOnce
+        };
 
-            listener && (criteria.listener = listener);
-            callback && (criteria.callback = callback);
-            eventName && (criteria.eventName = eventName);
+        publisher._mittyOn = publisher._mittyOn || [];
+        publisher._mittyOn.push(entry);
 
-            each(publisher._mittyOn, function(item) {
-
-                var shouldRemove = true;
-
-                each(criteria, function(name, ref) {
-                    if (item[name] !== ref) {
-                        shouldRemove = false;
-                    }
-                });
-
-                !shouldRemove && temp.push(item);
-
-            });
-
-            publisher._mittyOn = temp;
-
+        if (publisher !== listener) {
+            listener._mittyListenTo = listener._mittyListenTo || {};
+            listener._mittyListenTo[key] = entry;
         }
 
     }
 
-    function containsListener(publisher, listener) {
+    function removeEvent(publisher, eventName, callback) {
 
         if (publisher._mittyOn) {
-            for (var i = 0; i < publisher._mittyOn.length; i++) {
-                if (publisher._mittyOn[i].listener === listener) {
-                    return true;
+
+            publisher._mittyOn = publisher._mittyOn.filter(function(entry) {
+
+                var shouldRemove =
+                    (eventName ? eventName === entry.eventName : true) &&
+                    (callback ? callback === entry.callback : true)
+                ;
+
+                if (shouldRemove && (entry.listener !== entry.publisher)) {
+                    delete entry.listener._mittyListenTo[entry.key];
                 }
-            }
+
+                return !shouldRemove;
+
+            });
+
         }
-        return false;
 
     }
 
-    function removeFromListener(listener, publisher, eventName, callback) {
+    function removeEventFromListener(listener, publisher, eventName, callback) {
 
-        var listening = listener._mittyListenTo && listener._mittyListenTo.length > 0;
+        if (listener._mittyListenTo) {
 
-        if (publisher && listening) {
+            each(listener._mittyListenTo, function(key, entry) {
 
-            removeFromPublisher(publisher, listener, eventName, callback);
+                var shouldRemove =
+                    (publisher ? publisher === entry.publisher : true) &&
+                    (eventName ? eventName === entry.eventName : true) &&
+                    (callback ? callback === entry.callback : true)
+                ;
 
-            if (!containsListener(publisher, listener)) {
-                listener._mittyListenTo.splice(indexOf(listener._mittyListenTo, publisher), 1);
-            }
+                if (shouldRemove) {
+                    entry.publisher._mittyOn = entry.publisher._mittyOn.filter(function(item) {
+                        return item !== entry;
+                    });
+                    delete listener._mittyListenTo[key];
+                }
 
-        } else if (listening) {
-
-            each(listener._mittyListenTo, function(item) {
-                removeFromPublisher(item, listener);
             });
-            listener._mittyListenTo = [];
 
+        }
+
+    }
+
+    function each(collection, callback) {
+
+        for (var key in collection) {
+            collection.hasOwnProperty(key) && callback(key, collection[key]);
         }
 
     }

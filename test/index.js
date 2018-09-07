@@ -1,7 +1,7 @@
-var assert = require("chai").assert;
-var mitty = require("../");
+var assert = require('chai').assert;
+var mitty = require('../');
 
-describe("mitty", function() {
+describe('mitty', function() {
 
     it('augments object with events api', function() {
 
@@ -23,10 +23,12 @@ describe("mitty", function() {
         assert.strictEqual(musician,
             mittyMusician
                 .on('play', function(){})
+                .once('play', function(){})
                 .off('play')
                 .trigger('play')
-                .listenTo({}, 'play')
-                .stopListening({})
+                .listenTo({}, 'play', function(){})
+                .listenToOnce({}, 'play', function(){})
+                .stopListening()
         );
 
     });
@@ -68,37 +70,112 @@ describe("mitty", function() {
 
     });
 
+    it('once enables one time event listening', function() {
+
+        var musician = mitty({name: 'George', playedTimes: 0});
+
+        musician.once('play', function() {
+            musician.playedTimes += 1;
+        });
+
+        musician.trigger('play').trigger('play').trigger('play');
+
+        assert.equal(musician.playedTimes, 1);
+
+    });
+
     it('listenTo enables listening to other object events', function() {
 
         var musician = mitty({name: 'George'});
         var instrument = mitty({type: 'Guitar'});
+        var context;
 
         instrument.listenTo(musician, 'play', function() {
+            context = this;
             instrument.isProducingSound = true;
         });
 
         musician.trigger('play');
 
+        assert.strictEqual(context, instrument);
         assert.isTrue(instrument.isProducingSound);
 
     });
 
-    it('functions correctly when Array.prototype.indexOf is not implemented', function() {
-
-        var oldIndexOf = Array.prototype.indexOf;
-        Array.prototype.indexOf = undefined;
+    it('listenToOnce enables one time listening for other object events', function() {
 
         var musician = mitty({name: 'George'});
-        var instrument = mitty({type: 'Guitar'});
+        var instrument = mitty({type: 'Guitar', playedTimes: 0});
 
-        instrument.listenTo(musician, 'play', function() { instrument.isProducingSound = true; });
-        instrument.listenTo(musician, 'walkAway', function() {});
+        instrument.listenToOnce(musician, 'play', function() {
+            instrument.playedTimes += 1;
+        });
 
-        musician.trigger('play').off();
+        musician.trigger('play').trigger('play').trigger('play');
 
-        Array.prototype.indexOf = oldIndexOf;
+        assert.equal(instrument.playedTimes, 1);
 
-        assert.isTrue(instrument.isProducingSound);
+    });
+
+    it('off removes only specified callback', function() {
+
+        var musician = mitty({name: 'George'});
+        var instrument = 'drums';
+        var playHandler = function(instrumentType) {
+            musician.isPlayingInstrument = instrumentType;
+        };
+        var secondPlayHandler = function() {
+            musician.isPlayingAgain = true;
+        };
+
+        musician.on('play', playHandler).on('play', secondPlayHandler);
+        musician.off('play', playHandler);
+        musician.trigger('play', instrument);
+
+        assert.isUndefined(musician.isPlayingInstrument);
+        assert.isTrue(musician.isPlayingAgain);
+
+    });
+
+    it('off removes all callbacks for event name', function() {
+
+        var musician = mitty({name: 'George'});
+        var playCounter = 0;
+        var isDancing = false;
+
+        musician.on('play', function() {
+            ++playCounter;
+        }).on('play', function() {
+            ++playCounter;
+        }).on('dance', function() {
+            isDancing = true;
+        });
+
+        musician.off('play').trigger('play').trigger('dance');
+
+        assert.equal(playCounter, 0);
+        assert.isTrue(isDancing);
+
+    });
+
+    it('off removes all listeners when called with no arguments', function() {
+
+        var musician = mitty({name: 'George'});
+        var playCounter = 0;
+        var isDancing = false;
+
+        musician.on('play', function() {
+            ++playCounter;
+        }).on('play', function() {
+            ++playCounter;
+        }).on('dance', function() {
+            isDancing = true;
+        });
+
+        musician.off().trigger('play').trigger('dance');
+
+        assert.equal(playCounter, 0);
+        assert.isFalse(isDancing);
 
     });
 
@@ -166,57 +243,19 @@ describe("mitty", function() {
 
     });
 
-    it('off removes only specified callback', function() {
+    it('off with no arguments will remove listenTo subscriptions', function() {
 
         var musician = mitty({name: 'George'});
-        var instrument = 'drums';
-        var playHandler = function(instrument) {
-            musician.isPlayingInstrument = instrument;
-        };
-        var secondPlayHandler = function() {
-            musician.isPlayingAgain = true;
-        };
+        var instrument = mitty({type: 'Guitar'});
 
-        musician.on('play', playHandler).on('play', secondPlayHandler);
+        instrument.listenTo(musician, 'play', function() { instrument.isProducingSound = true; });
+        instrument.listenTo(musician, 'walkAway', function() { instrument.isSilent = true; });
 
-        musician.off('play', playHandler);
+        musician.off();
+        musician.trigger('play').trigger('walkAway');
 
-        musician.trigger('play', instrument);
-
-        assert.isUndefined(musician.isPlayingInstrument);
-        assert.isTrue(musician.isPlayingAgain);
-
-    });
-
-    it('off removes all callbacks for event name', function() {
-
-        var musician = mitty({name: 'George'});
-        var playCounter = 0;
-        var isDancing = false;
-
-        musician.on('play', function() { ++playCounter }).on('play', function() { ++playCounter });
-        musician.on('dance', function() { isDancing = true });
-
-        musician.off('play').trigger('play').trigger('dance');
-
-        assert.equal(playCounter, 0);
-        assert.isTrue(isDancing);
-
-    });
-
-    it('off removes all listeners when called with no arguments', function() {
-
-        var musician = mitty({name: 'George'});
-        var playCounter = 0;
-        var isDancing = false;
-
-        musician.on('play', function() { ++playCounter }).on('play', function() { ++playCounter });
-        musician.on('dance', function() { isDancing = true });
-
-        musician.off().trigger('play').trigger('dance');
-
-        assert.equal(playCounter, 0);
-        assert.isFalse(isDancing);
+        assert.isUndefined(instrument.isSilent);
+        assert.isUndefined(instrument.isProducingSound);
 
     });
 
